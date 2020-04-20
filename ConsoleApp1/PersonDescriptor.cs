@@ -6,21 +6,47 @@ namespace UnreflectedSerializer
 {
     class PersonDescriptor
     {
+        public string GetThisName() => "Person";
         private Person person { get; set; }
-        public string GetFirstNameFieldName => "FirstName";
-        public string GetFirstName => this.person.FirstName;
-        public string GetLastNameFieldName => "LastName";
-        public string GetLasttName => this.person.LastName;
-        public string GetHomeAdressFieldName => "HomeAddress";
+        public string GetFirstNameFieldName() => "FirstName";
+        public string GetFirstName() => this.person.FirstName;
+        public string GetLastNameFieldName() => "LastName";
+        public string GetLastName() => this.person.LastName;
+        public string GetHomeAdressFieldName() => "HomeAddress";
         public AddressDescriptor HomeAddress { get; set; }
-        public string GetWorkAdressFieldName => "WorkAddress";
+        public string GetWorkAdressFieldName() => "WorkAddress";
         public AddressDescriptor WorkAddress { get; set; }
-        public string GetCitizenOfFieldName => "CitizenOf";
+        public string GetCitizenOfFieldName() => "CitizenOf";
         public CountryDescriptor CitizenOf { get; set; }
-        public string GetMobilePhoneFieldName => "MobilePhone";
+        public string GetMobilePhoneFieldName() => "MobilePhone";
         public PhoneNumberDescriptor MobilePhone { get; set; }
 
         public int NumOfFields = 6;
+        public void GetDelegates(ref List<GetFieldName> getNames, ref List<GetValue> getValues, ref Queue<int> NumsOfFields)
+        {  
+            //Person itself
+            NumsOfFields.Enqueue(this.NumOfFields);
+            getNames.Add(new GetFieldName(GetThisName));
+            //First Name
+            NumsOfFields.Enqueue(1);
+            getNames.Add(new GetFieldName(GetFirstNameFieldName));
+            getValues.Add(new GetValue(GetFirstName));
+            //Last Name
+            NumsOfFields.Enqueue(1);
+            getNames.Add(new GetFieldName(GetLastNameFieldName));
+            getValues.Add(new GetValue(GetLastName));
+            //Home Address
+            getNames.Add(new GetFieldName(GetHomeAdressFieldName));
+            this.HomeAddress.GetDelegates(ref getNames, ref getValues, ref NumsOfFields);
+            //Work Address
+            getNames.Add(new GetFieldName(GetWorkAdressFieldName));
+            this.WorkAddress.GetDelegates(ref getNames, ref getValues, ref NumsOfFields);
+            //Citizen Of
+            getNames.Add(new GetFieldName(GetCitizenOfFieldName));
+            this.CitizenOf.GetDelegates(ref getNames, ref getValues, ref NumsOfFields);
+            //Mobile Phone
+            getNames.Add(new Dele)
+        }
 
         public PersonDescriptor()
         {
@@ -42,12 +68,25 @@ namespace UnreflectedSerializer
     class AddressDescriptor
     {
         private Address address { get; set; }
-        public string StreetFieldName => "Street";
-        public string GetStreet => this.address.Street;
-        public string CityFieldName => "City";
-        public string GetCity => this.address.City;
+        public string StreetFieldName()=> "Street";
+        public string GetStreet() => this.address.Street;
+        public string CityFieldName() => "City";
+        public string GetCity() => this.address.City;
 
         public int NumOfFields = 2;
+        public void GetDelegates(ref List<GetFieldName> getNames, ref List<GetValue> getValues, ref List<int> NumsOfFields)
+        {
+            //Adress itself
+            NumsOfFields.Add(this.NumOfFields);
+            //Street
+            NumsOfFields.Add(1);
+            getNames.Add(new GetFieldName(StreetFieldName));
+            getValues.Add(new GetValue(GetStreet));
+            //City
+            NumsOfFields.Add(1);
+            getNames.Add(new GetFieldName(CityFieldName));
+            getValues.Add(new GetValue(GetCity));
+        }
 
         public void FillValues(Address adress)
         {
@@ -57,12 +96,26 @@ namespace UnreflectedSerializer
     class CountryDescriptor
     {
         private Country country { get; set; }
-        public string GetNameFieldName => "Name";
-        public string GetName => this.country.Name;
-        public string GetAreaCodeFieldName => "AreaCode";
-        public string GetAreaCode => this.country.AreaCode.ToString();
+        public string NameFieldName() => "Name";
+        public string GetName() => this.country.Name;
+        public string AreaCodeFieldName() => "AreaCode";
+        public string GetAreaCode() => this.country.AreaCode.ToString();
 
-        public int NumOfFileds = 2;
+        public int NumOfFields = 2;
+        public void GetDelegates(ref List<GetFieldName> getNames, ref List<GetValue> getValues, ref List<int> NumsOfFields)
+        {
+            //Countrt itself
+            NumsOfFields.Add(this.NumOfFields);
+            //Name
+            NumsOfFields.Add(1);
+            getNames.Add(new GetFieldName(NameFieldName));
+            getValues.Add(new GetValue(GetName));
+            //Areas Code
+            NumsOfFields.Add(1);
+            getNames.Add(new GetFieldName(AreaCodeFieldName));
+            getValues.Add(new GetValue(GetAreaCode));
+        }
+
         public void FillValues(Country country)
         {
             this.country = country;
@@ -71,12 +124,25 @@ namespace UnreflectedSerializer
     class PhoneNumberDescriptor
     {
         private PhoneNumber phoneNumber { get; set; }
-        public string GetCountryFieldName => "Country";
+        public string GetCountryFieldName() => "Country";
         public CountryDescriptor Country { get; set; }
-        public string GetNumberFieldName => "Number";
-        public string GetNmber => this.phoneNumber.Number.ToString();
+        public string GetNumberFieldName() => "Number";
+        public string GetNumber() => this.phoneNumber.Number.ToString();
 
-        public int NumOfFilds = 2;
+        public int NumOfFields = 2;
+        public void GetDelegates(ref List<GetFieldName> getNames, ref List<GetValue> getValues, ref List<int> NumsOfFields)
+        {
+            //Phone number itself
+            NumsOfFields.Add(this.NumOfFields);
+            //Country
+            getNames.Add(new GetFieldName(GetCountryFieldName));
+            this.Country.GetDelegates(ref getNames, ref getValues, ref NumsOfFields);
+            //Number 
+            NumsOfFields.Add(1);
+            getNames.Add(new GetFieldName(GetNumberFieldName));
+            getValues.Add(new GetValue(GetNumber));
+        }
+
         public PhoneNumberDescriptor()
         {
             this.Country = new CountryDescriptor();
