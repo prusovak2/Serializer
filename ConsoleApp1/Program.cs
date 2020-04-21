@@ -65,7 +65,7 @@ namespace UnreflectedSerializer
 			}
 			else
 			{
-				//compund value
+				//compound value
 				builder.Append($"<{instanceName}>\n");
 				foreach (var GetStringRep in this.FuctionsDescribingThis)
 				{
